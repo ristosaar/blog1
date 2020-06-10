@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'otp_service.dart';
 
 void main() {
   runApp(MyApp());
@@ -23,14 +24,23 @@ class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
 
+
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   String _phoneNumber;
+  String _oneTimePassword;
+  final otpService = OneTimePasswordService();
 
-  void getOneTimePassword(){}
+  void getOneTimePassword() async {
+    var oneTimePasswordResponse = await otpService.getOneTimePassword(_phoneNumber);
+    setState(() {
+      _oneTimePassword = oneTimePasswordResponse.toString();
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   keyboardType: TextInputType.number),
               width: MediaQuery.of(context).size.width * 0.5,
             ),
+            if(_oneTimePassword != null) Text(_oneTimePassword),
             RaisedButton(
               onPressed: () {getOneTimePassword();},
               child: Text('Get Code'),
