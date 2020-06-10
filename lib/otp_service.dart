@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 import 'otp_response.dart';
+import 'verification_exception.dart';
 
 class MockHttpClient {
   var randomGenerator = new Random();
@@ -23,7 +24,13 @@ class MockHttpClient {
 class OneTimePasswordService {
   final httpClient = MockHttpClient();
   Future<OneTimePasswordResponse> getOneTimePassword(String phoneNumber) async {
-    final responseBody = await httpClient.getResponseBody();
-    return OneTimePasswordResponse.fromJson(responseBody);
+    try {
+      final responseBody = await httpClient.getResponseBody();
+      return OneTimePasswordResponse.fromJson(responseBody);
+    } on SocketException {
+      throw VerificationException('No Internet connection');
+    } on HttpException {
+      throw VerificationException("Service is unavailable");
+    }
   }
 }
