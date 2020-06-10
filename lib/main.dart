@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'otp_service.dart';
 import 'otp_response.dart';
+import 'verification_change_notifier.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,7 +18,10 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: ChangeNotifierProvider(
+        create: (_) => VerificationChangeNotifier(),
+        child: MyHomePage(title: 'Flutter Error Handling Demo'),
+      ),
     );
   }
 }
@@ -31,13 +36,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String _phoneNumber;
-  Future<OneTimePasswordResponse> otpResponseFuture;
-  final otpService = OneTimePasswordService();
-
   void getOneTimePassword() async {
-    setState(() {
-      otpResponseFuture = otpService.getOneTimePassword(_phoneNumber);
-    });
+    Provider.of<VerificationChangeNotifier>(context)
+        .getOneTimePassword(_phoneNumber);
   }
 
   @override
@@ -62,20 +63,19 @@ class _MyHomePageState extends State<MyHomePage> {
                   keyboardType: TextInputType.number),
               width: MediaQuery.of(context).size.width * 0.5,
             ),
-            FutureBuilder<OneTimePasswordResponse>(
-              future: otpResponseFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                } else if (snapshot.hasError) {
-                  final error = snapshot.error;
-                  return Text(error.toString());
-                } else if (snapshot.hasData) {
-                  final response = snapshot.data;
-                  return Text(response.toString());
-                } else {
+            Consumer<VerificationChangeNotifier>(
+              builder: (_, notifier, __) {
+                if (notifier.state == NotifierState.initial) {
                   return Text(
                       'After entering the phone number, press the button below');
+                } else if (notifier.state == NotifierState.loading) {
+                  return CircularProgressIndicator();
+                } else {
+                  if (notifier.exception != null) {
+                    return Text(notifier.exception.toString());
+                  } else {
+                    return Text(notifier.otpResponse.toString());
+                  }
                 }
               },
             ),

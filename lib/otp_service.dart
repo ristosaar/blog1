@@ -8,7 +8,7 @@ class MockHttpClient {
 
   Future<String> getResponseBody() async {
     await Future.delayed(Duration(milliseconds: 1000));
-    throw HttpException('500');
+    return _generateOneTimePassword();
   }
 
   _generateOneTimePassword() {
