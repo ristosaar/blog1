@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'otp_service.dart';
+import 'otp_response.dart';
 
 void main() {
   runApp(MyApp());
@@ -30,14 +31,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String _phoneNumber;
-  String _oneTimePassword;
+  Future<OneTimePasswordResponse> otpResponseFuture;
   final otpService = OneTimePasswordService();
 
   void getOneTimePassword() async {
-    var oneTimePasswordResponse =
-        await otpService.getOneTimePassword(_phoneNumber);
     setState(() {
-      _oneTimePassword = oneTimePasswordResponse.toString();
+      otpResponseFuture = otpService.getOneTimePassword(_phoneNumber);
     });
   }
 
@@ -63,7 +62,23 @@ class _MyHomePageState extends State<MyHomePage> {
                   keyboardType: TextInputType.number),
               width: MediaQuery.of(context).size.width * 0.5,
             ),
-            if (_oneTimePassword != null) Text(_oneTimePassword),
+            FutureBuilder<OneTimePasswordResponse>(
+              future: otpResponseFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  final error = snapshot.error;
+                  return Text(error.toString());
+                } else if (snapshot.hasData) {
+                  final response = snapshot.data;
+                  return Text(response.toString());
+                } else {
+                  return Text(
+                      'After entering the phone number, press the button below');
+                }
+              },
+            ),
             RaisedButton(
               onPressed: () {
                 getOneTimePassword();

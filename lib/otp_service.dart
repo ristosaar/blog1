@@ -23,11 +23,7 @@ class MockHttpClient {
 class OneTimePasswordService {
   final httpClient = MockHttpClient();
   Future<OneTimePasswordResponse> getOneTimePassword(String phoneNumber) async {
-    try {
-      final responseBody = await httpClient.getResponseBody();
-      return OneTimePasswordResponse.fromJson(responseBody);
-    } catch (e) {
-      print(e);
-    }
+    final responseBody = await httpClient.getResponseBody();
+    return OneTimePasswordResponse.fromJson(responseBody);
   }
 }
