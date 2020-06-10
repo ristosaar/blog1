@@ -24,7 +24,6 @@ class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
 
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -35,12 +34,12 @@ class _MyHomePageState extends State<MyHomePage> {
   final otpService = OneTimePasswordService();
 
   void getOneTimePassword() async {
-    var oneTimePasswordResponse = await otpService.getOneTimePassword(_phoneNumber);
+    var oneTimePasswordResponse =
+        await otpService.getOneTimePassword(_phoneNumber);
     setState(() {
       _oneTimePassword = oneTimePasswordResponse.toString();
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -64,9 +63,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   keyboardType: TextInputType.number),
               width: MediaQuery.of(context).size.width * 0.5,
             ),
-            if(_oneTimePassword != null) Text(_oneTimePassword),
+            if (_oneTimePassword != null) Text(_oneTimePassword),
             RaisedButton(
-              onPressed: () {getOneTimePassword();},
+              onPressed: () {
+                getOneTimePassword();
+              },
               child: Text('Get Code'),
             ),
           ],

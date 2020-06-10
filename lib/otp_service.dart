@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'otp_response.dart';
 
@@ -6,11 +7,8 @@ class MockHttpClient {
 
   Future<String> getResponseBody() async {
     await Future.delayed(Duration(milliseconds: 1000));
-    return _generateOneTimePassword();
+    throw HttpException('500');
   }
-
-
-
 
   _generateOneTimePassword() {
     return '{ "verificationCode": "' +
@@ -25,7 +23,11 @@ class MockHttpClient {
 class OneTimePasswordService {
   final httpClient = MockHttpClient();
   Future<OneTimePasswordResponse> getOneTimePassword(String phoneNumber) async {
-    final responseBody = await httpClient.getResponseBody();
-    return OneTimePasswordResponse.fromJson(responseBody);
+    try {
+      final responseBody = await httpClient.getResponseBody();
+      return OneTimePasswordResponse.fromJson(responseBody);
+    } catch (e) {
+      print(e);
+    }
   }
 }

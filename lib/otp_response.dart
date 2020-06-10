@@ -15,7 +15,8 @@ class OneTimePasswordResponse {
     );
   }
 
-  static OneTimePasswordResponse fromJson(String source) => fromMap(json.decode(source));
+  static OneTimePasswordResponse fromJson(String source) =>
+      fromMap(json.decode(source));
 
   @override
   String toString() {
